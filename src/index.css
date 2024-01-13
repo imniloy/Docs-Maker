@@ -1,20 +1,3 @@
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-.editor-placeholder {
-  color: #999;
-  overflow: hidden;
-  position: absolute;
-  text-overflow: ellipsis;
-  top: 8px;
-  left: 8px;
-  font-size: 1rem;
-  user-select: none;
-  display: inline-block;
-  pointer-events: none;
-} */
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -30,7 +13,7 @@
 }
 
 /* style for page size */
-.ql-container {
+.ql-container .ql-editor {
   width: 8.5in;
   min-height: 11in;
   padding: 0.5in;
@@ -54,13 +37,26 @@
 
 /* for printing docs */
 
+@page {
+  margin: 1in;
+}
+
 @media print {
   body {
     background: none !important;
   }
-  .ql-container {
+
+  .ql-container .ql-editor {
     width: 7.5in;
     min-height: 10in;
+    margin: 0;
+    padding: 0;
+    box-shadow: none !important;
+    align-self: flex-start;
+  }
+
+  .text-editor > #toolbar {
+    display: none !important;
   }
 }
 

@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "quill-mention";
 import "react-quill/dist/quill.snow.css";
 import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
 
 import { io } from "socket.io-client";
+import { SocketContext } from "../context/GlobalSocketProvider";
 const socketInstance = io("http://localhost:5000");
 
 let Font = Quill.import("formats/font");
@@ -149,19 +150,28 @@ Editor.formats = [
 ];
 
 export default function Editor() {
+  const socketInstance = useContext(SocketContext);
   const [value, setValue] = useState("");
+  console.log(value);
 
   useEffect(() => {
-    socketInstance.on("connect", () => {
-      socketInstance.on("Welcome", (data) => {
-        console.log(data);
-      });
-    });
+    if (!value) return;
+    if (socketInstance && socketInstance.connected) {
+      console.log("send-changes");
+      socketInstance.emit("send-changes", value);
+    }
+  }, [value, socketInstance]);
 
-    return () => {
-      socketInstance.off("connect");
+  useEffect(() => {
+    const handleChanges = (data) => {
+      console.log("receive-changes");
+      setValue(data);
     };
-  }, []);
+
+    if (socketInstance && socketInstance.connected) {
+      socketInstance.on("receive-changes", handleChanges);
+    }
+  }, [value, socketInstance]);
 
   return (
     <div className="text-editor">

@@ -1,67 +1,22 @@
 import React from "react";
-import Editor from "./components/Editor";
+// import Editor from "./components/Editor";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import GlobalSocketProvider from "./context/GlobalSocketProvider";
+import HomePage from "./pages/HomePage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import EditorPage from "./pages/EditorPage";
 const App = () => {
   return (
-    <div>
-      <Editor />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/docs/:id" element={<EditorPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 };
 
 export default App;
-
-// import Carousel from "./components/pizza/newCarousel";
-// // import Carousel from "./components/pizza/Carousel";
-// import Pizza from "./components/pizza/pizza.png";
-// export default function App() {
-//   const CarouselData = [
-//     {
-//       _id: 1,
-//       name: "Cheese Pizza",
-//       image: Pizza,
-//       price: 100,
-//       addOns: ["S", "M", "L"],
-//     },
-//     {
-//       _id: 2,
-//       name: "Veggie Pizza",
-//       image: Pizza,
-//       price: 10,
-//       addOns: ["S", "M", "L"],
-//     },
-//     {
-//       _id: 3,
-//       name: "Pepperoni Pizza",
-//       image: Pizza,
-//       price: 20,
-//       addOns: ["S", "M", "L"],
-//     },
-//     {
-//       _id: 4,
-//       name: "Meat Pizza",
-//       image: Pizza,
-//       price: 25,
-//       addOns: ["S", "M", "L"],
-//     },
-//     {
-//       _id: 5,
-//       name: "Margherita Pizza",
-//       image: Pizza,
-//       price: 21,
-//       addOns: ["S", "M", "L"],
-//     },
-
-//     {
-//       _id: 5,
-//       name: "BBQ Chicken Pizza",
-//       image: Pizza,
-//       price: 30,
-//       addOns: ["S", "M", "L"],
-//     },
-//   ];
-//   return (
-//     <div className="max-w-[600px] mx-auto w-full h-[100vh] bg-blue-500 overflow-hidden">
-//       <Carousel Data={CarouselData} />
-//     </div>
-//   );
-// }

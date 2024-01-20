@@ -6,7 +6,8 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import EditorPage from "./pages/EditorPage";
-import Avatar, { ConfigProvider } from "react-avatar";
+import { ConfigProvider } from "react-avatar";
+import SessionsPage from "./pages/SessionsPage";
 
 const App = () => {
   return (
@@ -17,6 +18,7 @@ const App = () => {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/docs/:id" element={<EditorPage />} />
+          <Route path="/myaccount/:id" element={<SessionsPage />} />
         </Routes>
       </BrowserRouter>
     </ConfigProvider>

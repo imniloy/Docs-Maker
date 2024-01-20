@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
+import Header from "../components/homepage/Header";
+import AllDocsContainer from "../components/homepage/AllDocsContainer"; 
 
 const HomePage = () => {
   return (
-    <div>HomePage</div>
-  )
-}
+    <main className="bg-white">
+      <Header />
+      <div className="max-w-7xl mx-auto py-3">
+        <AllDocsContainer />
+      </div>
+    </main>
+  );
+};
 
-export default HomePage
+export default HomePage;

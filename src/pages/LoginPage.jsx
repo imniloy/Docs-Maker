@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { base_url } from "../utils";
 
 const LoginPage = () => {
   const [loader, setLoader] = useState(false);
@@ -19,7 +20,7 @@ const LoginPage = () => {
     e.preventDefault();
 
     try {
-      const { data } = await fetch(`${base_url}/auth/register`, {
+      const { data } = await fetch(`${base_url}/api/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -96,7 +97,7 @@ const LoginPage = () => {
             </div>
             <button
               disabled={loader ? true : false}
-              className="bg-[#7367f0] w-full hover:bg-[#695ee0] hover:shadow-lg text-white rounded-md px-7 py-[6px] text-md mt-2"
+              className="bg-[#4285F4] w-full hover:bg-[#3b7de8] hover:shadow-lg text-white rounded-md px-7 py-[6px] text-md mt-2"
             >
               {loader ? (
                 <PropagateLoader color="#fff" cssOverride={overrideStyle} />

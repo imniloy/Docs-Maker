@@ -2,6 +2,49 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  .bg-brand-color {
+    @apply bg-[#4285F4];
+  }
+  .bg-brand-hover-color {
+    @apply bg-[#3b7de8];
+  }
+  .text-primary-black {
+    @apply text-[#5f6368];
+  }
+}
+
+.card_shadow {
+  box-shadow: #2f2b3d1a 0px 4px 18px !important;
+}
+.font-opensans {
+  font-family: "Open Sans", sans-serif;
+}
+
+.font-arimo {
+  font-family: "Arimo", sans-serif;
+}
+
+.font-comic {
+  font-family: "Comic Neue", cursive;
+}
+
+.font-montserrat {
+  font-family: "Montserrat", sans-serif;
+}
+
+.font-raleway {
+  font-family: "Raleway", sans-serif;
+}
+
+.font-roboto {
+  font-family: "Roboto", sans-serif;
+}
+
+.font-rubik {
+  font-family: "Rubik", sans-serif;
+}
+
 .quill {
   display: flex;
   justify-content: center;

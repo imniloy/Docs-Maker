@@ -23,17 +23,19 @@ const LoginPage = () => {
 
     try {
       const response = await fetch(`${base_url}/api/auth/register`, {
-        withCredentials: true,
         method: "POST",
 
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
+          "Cache-Control": "no-cache",
         },
         body: JSON.stringify(state),
       });
 
       const data = await response.json();
       localStorage.setItem("user_token", data.token);
+      navigate("/");
     } catch (e) {
       setError(e.message);
     }

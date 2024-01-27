@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { base_url } from "../utils";
+import PropagateLoader from "react-spinners/PropagateLoader";
 
 const LoginPage = () => {
   const [loader, setLoader] = useState(false);
@@ -9,7 +10,9 @@ const LoginPage = () => {
     email: "",
     password: "",
   });
+
   const [error, setError] = useState("");
+
   const inputHandle = (e) => {
     setSatate({
       ...state,
@@ -18,9 +21,9 @@ const LoginPage = () => {
   };
   const submit = async (e) => {
     e.preventDefault();
-
+    setLoader(true);
     try {
-      const { data } = await fetch(`${base_url}/api/auth/register`, {
+      const { data } = await fetch(`${base_url}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -30,7 +33,7 @@ const LoginPage = () => {
     } catch (e) {
       setError(e.message);
     }
-    console.log(state);
+    setLoader(false);
   };
 
   return (
@@ -97,10 +100,10 @@ const LoginPage = () => {
             </div>
             <button
               disabled={loader ? true : false}
-              className="bg-[#4285F4] w-full hover:bg-[#3b7de8] hover:shadow-lg text-white rounded-md px-7 py-[6px] text-md mt-2"
+              className="bg-[#4285F4] w-full hover:bg-[#3b7de8] hover:shadow-lg text-white rounded-md px-7 py-[4px] text-md mt-2 flex items-center justify-center"
             >
               {loader ? (
-                <PropagateLoader color="#fff" cssOverride={overrideStyle} />
+                <PropagateLoader color="#fff" className="h-6 w-6 mt-2" />
               ) : (
                 "Login"
               )}

@@ -3,10 +3,7 @@ import ReactQuill, { Quill } from "react-quill";
 import "quill-mention";
 import "react-quill/dist/quill.snow.css";
 import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
-
-import { io } from "socket.io-client";
 import { SocketContext } from "../context/GlobalSocketProvider";
-const socketInstance = io("http://localhost:5000");
 
 let Font = Quill.import("formats/font");
 let Size = Quill.import("formats/size");
@@ -158,14 +155,15 @@ export default function Editor() {
     if (!value) return;
     if (socketInstance && socketInstance.connected) {
       console.log("send-changes");
-      socketInstance.emit("send-changes", value);
+      socketInstance.emit("send-changes", { docId: "123", content: value });
     }
   }, [value, socketInstance]);
 
   useEffect(() => {
     const handleChanges = (data) => {
-      console.log("receive-changes");
-      setValue(data);
+      setValue(data.content);
+      console.log("received change");
+      console.log(data.content);
     };
 
     if (socketInstance && socketInstance.connected) {

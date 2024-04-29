@@ -1,4 +1,3 @@
-import io from "socket.io-client";
 const api_local_url = "http://localhost:5000";
 const api_production_url = "https://backend.qr-menu.xyz";
 
@@ -11,9 +10,6 @@ if (mode === "dev") {
 } else {
   base_url = api_production_url;
 }
-const socket = io(base_url, {
-  withCredentials: true,
-});
 
 const overrideStyle = {
   display: "flex",
@@ -23,4 +19,4 @@ const overrideStyle = {
   alignItems: "center",
 };
 
-export { base_url, socket, overrideStyle };
+export { base_url, overrideStyle };

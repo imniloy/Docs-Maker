@@ -5,21 +5,15 @@ const socketInstance = io("http://localhost:5000");
 export const SocketContext = createContext();
 
 const GlobalSocketProvider = ({ children }) => {
-  const [socket, setSocket] = useState(null);
+  const [socket, setSocket] = useState(socketInstance);
 
   useEffect(() => {
-    socketInstance.on("connect", () => {
-      setSocket(socketInstance);
-      // socketInstance.on("Welcome", (data) => {
-      //   console.log(data);
-      // });
-    });
-    console.log("object socket");
+    socketInstance.emit("joinRoom", "123");
+
     return () => {
-      socketInstance.off("connect");
+      socketInstance.off("connection");
     };
   }, []);
-  console.log("object 1");
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

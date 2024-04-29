@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { base_url } from "../utils";
+import React, { useContext, useLayoutEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
+import { base_url } from "../../utils";
 import PropagateLoader from "react-spinners/PropagateLoader";
 
 const LoginPage = () => {
@@ -23,22 +23,29 @@ const LoginPage = () => {
     e.preventDefault();
     setLoader(true);
     try {
-      const { data } = await fetch(`${base_url}/api/auth/login`, {
+      const response = await fetch(`${base_url}/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(state),
       });
+
+      const data = await response.json();
+      if (data.token) {
+        localStorage.setItem("user_token", data.token);
+        window.location.assign("/");
+      }
     } catch (e) {
-      setError(e.message);
+      setError(e?.message);
+      console.log(e);
     }
     setLoader(false);
   };
 
   return (
     <div className="min-w-screen min-h-screen bg-[#F8F7FA] flex justify-center items-center">
-      <div className="w-[370px] text-[#2f2b3dc7] relative h-[400px]">
+      <div className="w-[370px] text-[#2f2b3dc7] relative h-[420px]">
         <div className="w-[200px] h-[200px] absolute bg-gray-100 rounded-md -top-[45px] -left-[45px] z-0"></div>
         <div className="bg-[#fff] h-full card_shadow px-7 py-8 rounded-md absolute z-20">
           <div className="w-full justify-center items-center flex gap-3">
@@ -94,9 +101,6 @@ const LoginPage = () => {
                   Remember Me
                 </label>
               </div>
-              {/* <Link to="/forget-password" className="text-[#7367f0] text-sm">
-                Forgot Password?
-              </Link> */}
             </div>
             <button
               disabled={loader ? true : false}
@@ -108,6 +112,12 @@ const LoginPage = () => {
                 "Login"
               )}
             </button>
+            <div className="pt-4 pb-8">
+              Don't Have an account?
+              <Link to="/register" className="text-[#7367f0] text-sm">
+                Register
+              </Link>
+            </div>
           </form>
         </div>
       </div>

@@ -11,7 +11,7 @@ import { useLocation } from "react-router-dom";
 const Header = () => {
   const location = useLocation();
   const pathname = location.pathname;
-  console.log(pathname);
+  // console.log(pathname);
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [seletedFilter, setSeletedFilter] = useState("Owned by me");
@@ -97,9 +97,12 @@ const Header = () => {
         )}
         <div className="space-x-5 flex">
           {!pathname.startsWith("/myaccount") && (
-            <button className="py-[9px] px-6 font-medium text-sm bg-brand-color text-white hover:bg-brand-hover-color rounded">
+            <Link
+              to={`/docs/${crypto.randomUUID()}`}
+              className="py-[9px] px-6 font-medium text-sm bg-brand-color text-white hover:bg-brand-hover-color rounded"
+            >
               Create a doc
-            </button>
+            </Link>
           )}
           <div className="relative">
             <Avatar

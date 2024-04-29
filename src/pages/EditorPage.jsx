@@ -1,8 +1,10 @@
 import React from 'react'
-
+import CustomToolbar from "../components/Editor"
 const EditorPage = () => {
   return (
-    <div>EditorPage</div>
+    <div>
+      <CustomToolbar />
+    </div>
   )
 }
 

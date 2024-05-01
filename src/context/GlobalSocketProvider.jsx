@@ -8,12 +8,16 @@ const GlobalSocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(socketInstance);
 
   useEffect(() => {
-    socketInstance.emit("joinRoom", "123");
+    // socket.emit("joinRoom", "123");
+    socket.on("connect", () => {
+      console.log(socket.id + " connected");
+    });
 
     return () => {
-      socketInstance.off("connection");
+      socket.disconnect();
+      console.log("disconnected");
     };
-  }, []);
+  }, [socket]);
 
   return (
     <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

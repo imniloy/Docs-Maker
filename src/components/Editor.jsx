@@ -1,10 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "quill-mention";
 import "react-quill/dist/quill.snow.css";
 import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
 import { SocketContext } from "../context/GlobalSocketProvider";
-
+import { useParams } from "react-router-dom";
+import { AuthContext } from "../context/AuthProvider";
 let Font = Quill.import("formats/font");
 let Size = Quill.import("formats/size");
 // We do not add Aref Ruqaa since it is the default
@@ -105,18 +106,22 @@ Editor.modules = {
   },
 
   mention: {
-    allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+    // allowedChars: /^[A-Za-z\sÅÄÖåäö]*$/,
+    allowedChars: /^[A-Za-z0-9\sÅÄÖåäö]*$/, // Allow letters, numbers, and whitespace
+
     mentionDenotationChars: ["@", "#"],
     source: function (searchTerm, renderList, mentionChar) {
       if (searchTerm.length === 0) {
         renderList(atValues, searchTerm);
       } else {
         const matches = [];
-        for (let i = 0; i < atValues.length; i++)
+        for (let i = 0; i < atValues.length; i++) {
           if (
-            ~atValues[i].value.toLowerCase().indexOf(searchTerm.toLowerCase())
-          )
+            atValues[i].value.toLowerCase().includes(searchTerm.toLowerCase())
+          ) {
             matches.push(atValues[i]);
+          }
+        }
         renderList(matches, searchTerm);
       }
     },
@@ -148,28 +153,31 @@ Editor.formats = [
 
 export default function Editor() {
   const socketInstance = useContext(SocketContext);
+  const userInfo = useContext(AuthContext);
+  const { id } = useParams();
   const [value, setValue] = useState("");
-  console.log(value);
 
   useEffect(() => {
-    if (!value) return;
-    if (socketInstance && socketInstance.connected) {
-      console.log("send-changes");
-      socketInstance.emit("send-changes", { docId: "123", content: value });
-    }
-  }, [value, socketInstance]);
+    socketInstance.emit("joinRoom", id);
+  }, [socketInstance, id]);
 
   useEffect(() => {
+    if (!id || !userInfo || !userInfo.token) return;
+
     const handleChanges = (data) => {
-      setValue(data.content);
-      console.log("received change");
-      console.log(data.content);
+      if (data.userId != userInfo.user._id) {
+        console.log("received changes...");
+        console.log(data.content);
+        setValue(data.content);
+      }
     };
 
-    if (socketInstance && socketInstance.connected) {
-      socketInstance.on("receive-changes", handleChanges);
-    }
-  }, [value, socketInstance]);
+    socketInstance.on("receive-changes", handleChanges);
+
+    return () => {
+      socketInstance.off("receive-changes", handleChanges);
+    };
+  }, [socketInstance, id, userInfo]);
 
   return (
     <div className="text-editor">
@@ -179,7 +187,15 @@ export default function Editor() {
         modules={Editor.modules}
         formats={Editor.formats}
         value={value}
-        onChange={setValue}
+        onChange={(value) => {
+          setValue(value);
+          socketInstance.emit("send-changes", {
+            docId: id,
+            content: value,
+            userId: userInfo.user._id,
+          });
+        }}
+        preserveWhitespace
       />
     </div>
   );

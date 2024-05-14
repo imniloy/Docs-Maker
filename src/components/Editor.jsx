@@ -4,10 +4,12 @@ import "quill-mention";
 import "react-quill/dist/quill.snow.css";
 import BlotFormatter from "quill-blot-formatter/dist/BlotFormatter";
 import { SocketContext } from "../context/GlobalSocketProvider";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthProvider";
 let Font = Quill.import("formats/font");
 let Size = Quill.import("formats/size");
+import DocsLogo from "./assets/docs.png";
+import { base_url } from "../../utils";
 // We do not add Aref Ruqaa since it is the default
 Font.whitelist = [
   "Arimo",
@@ -48,49 +50,129 @@ const atValues = [
   { id: 7, value: "supplierid" },
 ];
 
-const CustomToolbar = () => (
-  <div
-    id="toolbar"
-    className="flex justify-center sticky top-0 left-0 right-0 z-10 bg-[#f3f3f3]"
-  >
-    <select className="ql-font">
-      {Font.whitelist.map((font, index) => (
-        <option key={font} value={font} defaultValue={!index}>
-          {font[0].toUpperCase() + font.substr(1)}
-        </option>
-      ))}
-    </select>
-    <select className="ql-size">
-      {Size.whitelist.map((size, index) => (
-        <option key={index} value={size} defaultValue={size.includes("12")}>
-          {size}
-        </option>
-      ))}
-    </select>
+const CustomToolbar = ({ doc_name, set_doc_name }) => {
+  const [saving_state, set_saving_state] = useState(false);
+  const { id } = useParams();
+  const userInfo = useContext(AuthContext);
+  const socketInstance = useContext(SocketContext);
 
-    <button className="ql-bold" />
-    <button className="ql-underline" />
-    <button className="ql-italic" />
-    <button className="ql-strike" />
-    <button className="ql-blockquote" />
-    <button className="ql-code-block" />
-    <button className="ql-list" value="ordered" />
-    <button className="ql-list" value="bullet" />
-    <button className="ql-link" />
-    <button className="ql-image" />
-    <button className="ql-video" />
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    set_saving_state(true);
+    try {
+      const response = await fetch(
+        `${base_url}/api/docs/update-doc-name/${id}`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ id, name: doc_name }),
+        }
+      );
 
-    <button className="ql-indent" value="-1" />
-    <button className="ql-indent" value="+1" />
+      const data = await response.json();
+      if (data.data._id) {
+        console.log("enteres");
 
-    <button className="ql-align" value="" />
-    <button className="ql-align" value="center" />
-    <button className="ql-align" value="right" />
+        socketInstance.emit("document-name-change", {
+          docId: id,
+          name: data.data.name,
+          userId: userInfo.user._id,
+        });
+      }
+    } catch (e) {
+      console.error("Error submitting form:", e);
+    } finally {
+      set_saving_state(false);
+    }
+  };
 
-    <select className="ql-color ql-picker ql-color-picker"></select>
-    <select className="ql-background ql-picker ql-color-picker"></select>
-  </div>
-);
+  useEffect(() => {
+    const handleNewDocumentName = (data) => {
+      if (data) {
+        if (data.userId != userInfo.user._id) {
+          set_doc_name(data.name);
+        }
+      }
+    };
+
+    const loading_handler = (data) => {
+      if (data) {
+        set_saving_state(data.loading_state);
+      }
+    };
+
+    socketInstance.on("new-document_name", handleNewDocumentName);
+    socketInstance.on("saving_docs", loading_handler);
+
+    return () => {
+      socketInstance.off("new-document_name", handleNewDocumentName);
+      socketInstance.off("saving_docs", loading_handler);
+    };
+  }, [socketInstance, userInfo]);
+
+  return (
+    <div className="sticky top-0 left-0 right-0 z-10">
+      <div className="flex items-center justify-between bg-[#fff] px-4 py-4">
+        <form onSubmit={handleSubmit} className="flex items-center space-x-1">
+          <img src={DocsLogo} className="h-6 w-6" alt="DocsLogo" />
+          <input
+            value={doc_name}
+            onChange={(e) => {
+              set_doc_name(e.target.value);
+            }}
+            className="font-medium text-lg leading-[24px]"
+          />
+        </form>
+
+        <div className="px-6 py-2 font-bold bg-blue-500 text-white">
+          {saving_state ? "Saveing" : "Saved"}
+        </div>
+      </div>
+      <div id="toolbar" className="flex justify-center bg-blue-50">
+        <select className="ql-font">
+          {Font.whitelist.map((font, index) => (
+            <option key={font} value={font} defaultValue={!index}>
+              {font[0].toUpperCase() + font.substr(1)}
+            </option>
+          ))}
+        </select>
+        <select className="ql-size">
+          {Size.whitelist.map((size, index) => (
+            <option key={index} value={size} defaultValue={size.includes("12")}>
+              {size}
+            </option>
+          ))}
+        </select>
+
+        <button className="ql-bold" />
+        <button className="ql-underline" />
+        <button className="ql-italic" />
+        <button className="ql-strike" />
+        <button className="ql-blockquote" />
+        <button className="ql-code-block" />
+        <button className="ql-list" value="ordered" />
+        <button className="ql-list" value="bullet" />
+        <button className="ql-link" />
+        <button className="ql-image" />
+        <button className="ql-video" />
+
+        <button className="ql-indent" value="-1" />
+        <button className="ql-indent" value="+1" />
+
+        <button className="ql-align" value="" />
+        <button className="ql-align" value="center" />
+        <button className="ql-align" value="right" />
+
+        <select className="ql-color ql-picker ql-color-picker"></select>
+        <select className="ql-background ql-picker ql-color-picker"></select>
+      </div>
+    </div>
+  );
+};
 
 Editor.modules = {
   toolbar: {
@@ -156,47 +238,60 @@ export default function Editor() {
   const userInfo = useContext(AuthContext);
   const { id } = useParams();
   const [value, setValue] = useState("");
+  const [doc_name, set_doc_name] = useState("Untitled Document");
 
   useEffect(() => {
-    socketInstance.emit("joinRoom", id);
-  }, [socketInstance, id]);
+    if (userInfo && userInfo.user && userInfo.user._id) {
+      socketInstance.emit("joinRoom", { id, user: userInfo.user });
+    }
+  }, [socketInstance, id, userInfo]);
 
   useEffect(() => {
     if (!id || !userInfo || !userInfo.token) return;
 
     const handleChanges = (data) => {
       if (data.userId != userInfo.user._id) {
-        console.log("received changes...");
-        console.log(data.content);
+        console.log(data);
         setValue(data.content);
       }
     };
+
+    const load_data_change = (data) => {
+      setValue(data?.data);
+      set_doc_name(data?.name);
+    };
+
+    socketInstance.on("load-data", load_data_change);
 
     socketInstance.on("receive-changes", handleChanges);
 
     return () => {
       socketInstance.off("receive-changes", handleChanges);
+      socketInstance.off("load-data", load_data_change);
     };
   }, [socketInstance, id, userInfo]);
 
   return (
-    <div className="text-editor">
-      <CustomToolbar />
-      <ReactQuill
-        theme="snow"
-        modules={Editor.modules}
-        formats={Editor.formats}
-        value={value}
-        onChange={(value) => {
-          setValue(value);
-          socketInstance.emit("send-changes", {
-            docId: id,
-            content: value,
-            userId: userInfo.user._id,
-          });
-        }}
-        preserveWhitespace
-      />
+    <div className="w-full">
+      <div className="text-editor">
+        <CustomToolbar doc_name={doc_name} set_doc_name={set_doc_name} />
+        <ReactQuill
+          theme="snow"
+          modules={Editor.modules}
+          formats={Editor.formats}
+          value={value}
+          onChange={(value) => {
+            setValue(value);
+
+            socketInstance.emit("send-changes", {
+              docId: id,
+              content: value,
+              userId: userInfo.user._id,
+            });
+          }}
+          preserveWhitespace
+        />
+      </div>
     </div>
   );
 }

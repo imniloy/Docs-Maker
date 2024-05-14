@@ -1,7 +1,10 @@
 import { io } from "socket.io-client";
 import { createContext, useEffect, useState } from "react";
 
-const socketInstance = io("http://localhost:5000");
+const socketInstance = io("http://localhost:5000", {
+  transports: ["websocket"],
+  maxHttpBufferSize: 1e8, // Set the maximum payload size to 100MB (in bytes)
+});
 export const SocketContext = createContext();
 
 const GlobalSocketProvider = ({ children }) => {

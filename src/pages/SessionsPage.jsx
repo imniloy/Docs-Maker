@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Header from "../components/homepage/Header";
 import { useNavigate } from "react-router-dom";
 import Cookies from "js-cookie";
@@ -9,12 +9,13 @@ import { FaApple } from "react-icons/fa6";
 import { HiDevicePhoneMobile } from "react-icons/hi2";
 import { FaLaptopCode } from "react-icons/fa6";
 import moment from "moment";
+import { AuthContext } from "../context/AuthProvider";
 
 const SessionsPage = () => {
   const [loginHistories, setLoginHistories] = useState([]);
   const navigate = useNavigate();
   const userCookie = Cookies.get("userToken");
-  const token = localStorage.getItem("user_token");
+  const user = useContext(AuthContext);
   const deviceTypes = ["macos", "mac", "windows", "linux"];
   const getHistories_data = async () => {
     try {
@@ -22,7 +23,7 @@ const SessionsPage = () => {
         method: "GET",
         credentials: "include",
         headers: {
-          Authorization: "Bearer " + token,
+          authorization: `Bearer ${user.token}`,
           "Content-Type": "application/json",
           "Cache-Control": "no-cache",
         },
@@ -30,6 +31,7 @@ const SessionsPage = () => {
 
       const { data } = await response.json();
 
+      console.log(data);
       if (data?.length > 0) {
         setLoginHistories(data);
       }
@@ -43,8 +45,10 @@ const SessionsPage = () => {
   };
 
   useEffect(() => {
-    getHistories_data();
-  }, [token]);
+    if (user && user.token && user.user._id) {
+      getHistories_data();
+    }
+  }, [user]);
 
   return (
     <div className="w-full font-opensans">

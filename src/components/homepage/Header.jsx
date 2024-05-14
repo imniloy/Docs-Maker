@@ -7,11 +7,11 @@ import { MdOutlineDone } from "react-icons/md";
 import { PiSignOutBold } from "react-icons/pi";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const Header = () => {
   const location = useLocation();
   const pathname = location.pathname;
-  // console.log(pathname);
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [seletedFilter, setSeletedFilter] = useState("Owned by me");
@@ -32,7 +32,11 @@ const Header = () => {
     setshowFilter(false);
   };
 
-  const signOutFunc = () => {};
+  const signOutFunc = () => {
+    localStorage.removeItem("user_token");
+    // Cookies.remove("userToken");
+    window.location.assign("/");
+  };
 
   return (
     <header className="font-opensans">
@@ -237,13 +241,15 @@ const Header = () => {
                 </div>
               </div>
               <div className="w-[150px]">
-                <p className="text-sm font-semibold text-center">
-                  Last opened by me
-                </p>
+                <p className="text-sm font-semibold text-center">Owner</p>
+              </div>
+
+              <div className="w-[150px]">
+                <p className="text-sm font-semibold text-center">Created At</p>
               </div>
 
               <div className="w-[70px]">
-                <p className="text-sm font-semibold text-right">Remove</p>
+                <p className="text-sm font-semibold text-right">Actions</p>
               </div>
             </div>
           </div>
